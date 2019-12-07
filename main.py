@@ -49,6 +49,16 @@ collected_tweet_arr = [x for x in collected_tweet_df["tweet"]]
 
 X_c = clean_tweets(collected_tweet_arr)
 
+import csv
+csvFile = open("clean.csv", 'w', newline='')
+csvWriter = csv.writer(csvFile)
+csvWriter.writerow(["Tweets"])
+
+for i in range (len(X_c)):
+    csvFile = open("clean.csv", 'a', newline='')
+    csvWriter = csv.writer(csvFile)
+    csvWriter.writerow([X_c[i]])
+
 tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
 tokenizer.fit_on_texts(X_c)
 
