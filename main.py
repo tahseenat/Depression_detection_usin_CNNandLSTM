@@ -26,7 +26,6 @@ MAX_SEQUENCE_LENGTH = 140
 MAX_NB_WORDS = 20000
 EMBEDDING_DIM = 300
 
-
 # Splitting the arrays into test (70%), validation (20%), and train data (20%)
 TRAIN_SPLIT = 0.7
 TEST_SPLIT = 0.2
@@ -50,11 +49,12 @@ collected_tweet_arr = [x for x in collected_tweet_df["tweet"]]
 X_c = clean_tweets(collected_tweet_arr)
 
 import csv
+
 csvFile = open("clean.csv", 'w', newline='')
 csvWriter = csv.writer(csvFile)
 csvWriter.writerow(["Tweets"])
 
-for i in range (len(X_c)):
+for i in range(len(X_c)):
     csvFile = open("clean.csv", 'a', newline='')
     csvWriter = csv.writer(csvFile)
     csvWriter.writerow([X_c[i]])
@@ -83,15 +83,14 @@ for (word, idx) in word_index.items():
 
 labels_c = [x for x in collected_tweet_df["label"]]
 
+data_train = data_c[0:int(5000 * TRAIN_SPLIT)]
+labels_train = labels_c[0:int(5000 * TRAIN_SPLIT)]
 
-data_train = data_c[0:int(5000*TRAIN_SPLIT)]
-labels_train = labels_c[0:int(5000*TRAIN_SPLIT)]
+data_test = data_c[int(5000 * TRAIN_SPLIT):int(5000 * (TEST_SPLIT + TRAIN_SPLIT))]
+labels_test = labels_c[int(5000 * TRAIN_SPLIT):int(5000 * (TEST_SPLIT + TRAIN_SPLIT))]
 
-data_test = data_c[int(5000*TRAIN_SPLIT):int(5000*(TEST_SPLIT+TRAIN_SPLIT))]
-labels_test = labels_c[int(5000*TRAIN_SPLIT):int(5000*(TEST_SPLIT+TRAIN_SPLIT))]
-
-data_val = data_c[int(5000*(TEST_SPLIT+TRAIN_SPLIT)):5000]
-labels_val = labels_c[int(5000*(TEST_SPLIT+TRAIN_SPLIT)):5000]
+data_val = data_c[int(5000 * (TEST_SPLIT + TRAIN_SPLIT)):5000]
+labels_val = labels_c[int(5000 * (TEST_SPLIT + TRAIN_SPLIT)):5000]
 
 model = brain(embedding_matrix, EMBEDDING_DIM, MAX_SEQUENCE_LENGTH)
 print(model.summary())
@@ -107,11 +106,9 @@ labels_c_pred = model.predict(data_test)
 labels_pred = np.round(labels_c_pred.flatten())
 
 accuracy = accuracy_score(labels_test, labels_pred)
-print("Accuracy: %.2f%%" % (accuracy*100))
+print("Accuracy: %.2f%%" % (accuracy * 100))
 
 print(classification_report(labels_test, labels_pred))
 
 model_name = "with_5000_dataset_acc={}".format(accuracy)
 model.save(model_name)
-
-

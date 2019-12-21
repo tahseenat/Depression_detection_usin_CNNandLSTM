@@ -31,12 +31,12 @@ MAX_NB_WORDS = 20000
 EMBEDDING_DIM = 300
 
 # Splitting the arrays into test (60%), validation (20%), and train data (20%)
-TRAIN_SPLIT = 0.8
-TEST_SPLIT = 0.1
+TRAIN_SPLIT = 0.7
+TEST_SPLIT = 0.2
 LEARNING_RATE = 0.1
 EPOCHS = 15
 
-CREATED_DATASET = "final-output_2.csv"
+CREATED_DATASET = "final-output.csv"
 
 EMBEDDING_FILE = 'GoogleNews-vectors-negative300.bin'
 
@@ -76,16 +76,14 @@ for (word, idx) in word_index.items():
 
 labels_c = [x for x in collected_tweet_df["label"]]
 
-use_rows = 20000
+data_train = data_c[0:int(5000*TRAIN_SPLIT)]
+labels_train = labels_c[0:int(5000*TRAIN_SPLIT)]
 
-data_train = data_c[0:int(use_rows*TRAIN_SPLIT)]
-labels_train = labels_c[0:int(use_rows*TRAIN_SPLIT)]
+data_test = data_c[int(5000*TRAIN_SPLIT):int(5000*(TEST_SPLIT+TRAIN_SPLIT))]
+labels_test = labels_c[int(5000*TRAIN_SPLIT):int(5000*(TEST_SPLIT+TRAIN_SPLIT))]
 
-data_test = data_c[int(use_rows*TRAIN_SPLIT):int(use_rows*(TEST_SPLIT+TRAIN_SPLIT))]
-labels_test = labels_c[int(use_rows*TRAIN_SPLIT):int(use_rows*(TEST_SPLIT+TRAIN_SPLIT))]
-
-data_val = data_c[int(use_rows*(TEST_SPLIT+TRAIN_SPLIT)):use_rows]
-labels_val = labels_c[int(use_rows*(TEST_SPLIT+TRAIN_SPLIT)):use_rows]
+data_val = data_c[int(5000*(TEST_SPLIT+TRAIN_SPLIT)):5000]
+labels_val = labels_c[int(5000*(TEST_SPLIT+TRAIN_SPLIT)):5000]
 
 #loading model
 model = brain(embedding_matrix, EMBEDDING_DIM, MAX_SEQUENCE_LENGTH)
