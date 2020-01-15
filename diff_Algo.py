@@ -31,10 +31,7 @@ MAX_NB_WORDS = 20000
 EMBEDDING_DIM = 300
 
 # Splitting the arrays into test (60%), validation (20%), and train data (20%)
-TRAIN_SPLIT = 0.8
-TEST_SPLIT = 0.1
-LEARNING_RATE = 0.1
-EPOCHS = 15
+
 
 CREATED_DATASET = "final-output_2.csv"
 
@@ -51,6 +48,7 @@ word2vec = KeyedVectors.load_word2vec_format(EMBEDDING_FILE, binary=True)
 collected_tweet_arr = [x for x in collected_tweet_df["tweet"]]
 
 X_c = clean_tweets(collected_tweet_arr)
+
 
 tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
 tokenizer.fit_on_texts(X_c)
@@ -76,7 +74,11 @@ for (word, idx) in word_index.items():
 
 labels_c = [x for x in collected_tweet_df["label"]]
 
-use_rows = 20000
+use_rows = 15000
+TRAIN_SPLIT = 0.7
+TEST_SPLIT = 0.2
+LEARNING_RATE = 0.1
+EPOCHS = 15
 
 data_train = data_c[0:int(use_rows*TRAIN_SPLIT)]
 labels_train = labels_c[0:int(use_rows*TRAIN_SPLIT)]
@@ -93,9 +95,12 @@ model = brain(embedding_matrix, EMBEDDING_DIM, MAX_SEQUENCE_LENGTH)
 early_stop = EarlyStopping(monitor='val_loss', patience=3)
 
 model.compile(loss='binary_crossentropy', optimizer='nadam', metrics=['acc'])
+print(model.summary())
 
-hist = model.fit(data_train, labels_train, validation_data=(data_val, labels_val), epochs=EPOCHS, batch_size=100,
+hist = model.fit(data_train, labels_train, validation_data=(data_val[0:1499], labels_val[0:1499]), epochs=EPOCHS,
+                 batch_size=100,
                  shuffle=True, callbacks=[early_stop])
+
 
 #predict
 labels_c_pred = model.predict(data_test)

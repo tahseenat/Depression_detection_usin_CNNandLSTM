@@ -15,11 +15,15 @@ def brain(embedding_matrix, EMBEDDING_DIM, MAX_SEQUENCE_LENGTH):
                         input_length=MAX_SEQUENCE_LENGTH, trainable=False))
 
     model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
-    model.add(MaxPooling1D(pool_size=2))
-    model.add(Dropout(0.2))
+    model.add(MaxPooling1D(pool_size=3))
+    model.add(Dropout(0.3))
 
-    model.add(LSTM(300))
-    model.add(Dropout(0.2))
+    model.add(Conv1D(filters=32, kernel_size=3, padding='same', activation='relu'))
+    model.add(MaxPooling1D(pool_size=3))
+    model.add(Dropout(0.3))
+
+    model.add(LSTM(3500))
+    model.add(Dropout(0.4))
     model.add(Dense(1, activation='sigmoid'))
 
     model.compile(loss='binary_crossentropy', optimizer='nadam', metrics=['acc'])
