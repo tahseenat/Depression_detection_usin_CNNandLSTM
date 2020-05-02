@@ -5,6 +5,7 @@ Created on Tue Nov 4 2019
 @author: tahseenat
 """
 import warnings
+
 warnings.filterwarnings("ignore")
 from gensim.models import KeyedVectors
 
@@ -20,6 +21,7 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix, roc_auc_score, classification_report
+
 warnings.filterwarnings("ignore")
 
 # Reproducibility
@@ -48,7 +50,6 @@ word2vec = KeyedVectors.load_word2vec_format(EMBEDDING_FILE, binary=True)
 collected_tweet_arr = [x for x in collected_tweet_df["tweet"]]
 
 X_c = clean_tweets(collected_tweet_arr)
-
 
 tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
 tokenizer.fit_on_texts(X_c)
@@ -80,16 +81,16 @@ TEST_SPLIT = 0.2
 LEARNING_RATE = 0.1
 EPOCHS = 15
 
-data_train = data_c[0:int(use_rows*TRAIN_SPLIT)]
-labels_train = labels_c[0:int(use_rows*TRAIN_SPLIT)]
+data_train = data_c[0:int(use_rows * TRAIN_SPLIT)]
+labels_train = labels_c[0:int(use_rows * TRAIN_SPLIT)]
 
-data_test = data_c[int(use_rows*TRAIN_SPLIT):int(use_rows*(TEST_SPLIT+TRAIN_SPLIT))]
-labels_test = labels_c[int(use_rows*TRAIN_SPLIT):int(use_rows*(TEST_SPLIT+TRAIN_SPLIT))]
+data_test = data_c[int(use_rows * TRAIN_SPLIT):int(use_rows * (TEST_SPLIT + TRAIN_SPLIT))]
+labels_test = labels_c[int(use_rows * TRAIN_SPLIT):int(use_rows * (TEST_SPLIT + TRAIN_SPLIT))]
 
-data_val = data_c[int(use_rows*(TEST_SPLIT+TRAIN_SPLIT)):use_rows]
-labels_val = labels_c[int(use_rows*(TEST_SPLIT+TRAIN_SPLIT)):use_rows]
+data_val = data_c[int(use_rows * (TEST_SPLIT + TRAIN_SPLIT)):use_rows]
+labels_val = labels_c[int(use_rows * (TEST_SPLIT + TRAIN_SPLIT)):use_rows]
 
-#loading model
+# loading model
 model = brain(embedding_matrix, EMBEDDING_DIM, MAX_SEQUENCE_LENGTH)
 
 early_stop = EarlyStopping(monitor='val_loss', patience=3)
@@ -101,70 +102,69 @@ hist = model.fit(data_train, labels_train, validation_data=(data_val[0:1499], la
                  batch_size=100,
                  shuffle=True, callbacks=[early_stop])
 
-
-#predict
+# predict
 labels_c_pred = model.predict(data_test)
 
 labels_pred = np.round(labels_c_pred.flatten())
 
 accuracy = accuracy_score(labels_test, labels_pred)
-print("Accuracy: %.2f%%" % (accuracy*100))
+print("Accuracy: %.2f%%" % (accuracy * 100))
 print(classification_report(labels_test, labels_pred))
-print(roc_auc_score(labels_test,labels_pred))#base model
+print(roc_auc_score(labels_test, labels_pred))  # base model
 
-
-#logic regression
+# logic regression
 clf = LogisticRegression(random_state=0, solver='saga', multi_class='ovr').fit(data_train, labels_train)
 Y_predit = clf.predict(data_test)
 print(sum(Y_predit == labels_test) / len(labels_test))
-matrix = confusion_matrix(labels_test,Y_predit)
+matrix = confusion_matrix(labels_test, Y_predit)
 print(matrix)
-print(classification_report(labels_test,Y_predit))
-print(roc_auc_score(labels_test,Y_predit))
+print(classification_report(labels_test, Y_predit))
+print(roc_auc_score(labels_test, Y_predit))
 
-
-#Decision tree
+# Decision tree
 from sklearn import tree
+
 clf = tree.DecisionTreeClassifier()
 clf = clf.fit(data_train, labels_train)
-pred=clf.predict(data_test)
-matrix = confusion_matrix(labels_test,pred)
+pred = clf.predict(data_test)
+matrix = confusion_matrix(labels_test, pred)
 print(matrix)
-print(classification_report(labels_test,pred))
-print(roc_auc_score(labels_test,pred))#base model
+print(classification_report(labels_test, pred))
+print(roc_auc_score(labels_test, pred))  # base model
 
-
-#naive bayes
+# naive bayes
 from sklearn.naive_bayes import GaussianNB
+
 gnb = GaussianNB()
 gnb_model = gnb.fit(data_train, labels_train)
 pred = gnb_model.predict(data_test)
 
-
-matrix = confusion_matrix(labels_test,pred)
+matrix = confusion_matrix(labels_test, pred)
 print(matrix)
-print(classification_report(labels_test,pred))
-print(roc_auc_score(labels_test,pred))#base model
+print(classification_report(labels_test, pred))
+print(roc_auc_score(labels_test, pred))  # base model
 
-#SVM
+# SVM
 from sklearn import svm
+
 clf = svm.SVC(gamma='scale')
 clf = clf.fit(data_train, labels_train)
 pred = clf.predict(data_test)
 
-matrix = confusion_matrix(labels_test,pred)
+matrix = confusion_matrix(labels_test, pred)
 print(matrix)
-print(classification_report(labels_test,pred))
-print(roc_auc_score(labels_test,pred))#base model
+print(classification_report(labels_test, pred))
+print(roc_auc_score(labels_test, pred))  # base model
 
-#KNN
+# KNN
 from sklearn.neighbors import KNeighborsClassifier
+
 neigh = KNeighborsClassifier(n_neighbors=5)
 neigh.fit(data_train, labels_train)
-#KNeighborsClassifier(...)
+# KNeighborsClassifier(...)
 pred = neigh.predict(data_test)
 
-matrix = confusion_matrix(labels_test,pred)
+matrix = confusion_matrix(labels_test, pred)
 print(matrix)
-print(classification_report(labels_test,pred))
-print(roc_auc_score(labels_test,pred))#base model
+print(classification_report(labels_test, pred))
+print(roc_auc_score(labels_test, pred))  # base model
